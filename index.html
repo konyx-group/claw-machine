@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Claw Machine 🧸</title>
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="room">
+
+        <!-- =================== ARCADE CLAW MACHINE =================== -->
+        <div class="machine">
+
+            <!-- 1. MARQUEE / TOP SIGN -->
+            <div class="marquee">
+                <div class="led-row" aria-hidden="true">
+                    <span class="led d1"></span><span class="led d2"></span><span class="led d3"></span>
+                    <span class="led d4"></span><span class="led d1"></span><span class="led d2"></span>
+                    <span class="led d3"></span><span class="led d4"></span><span class="led d1"></span>
+                    <span class="led d2"></span><span class="led d3"></span><span class="led d4"></span>
+                    <span class="led d1"></span><span class="led d2"></span>
+                </div>
+                <div class="sign-title">🧸 <span>LOVE CLAW</span> 🎯</div>
+                <div class="sign-sub">အရုပ်ကောက် MACHINE</div>
+                <div class="led-row led-bottom" aria-hidden="true">
+                    <span class="led d3"></span><span class="led d4"></span><span class="led d1"></span>
+                    <span class="led d2"></span><span class="led d3"></span><span class="led d4"></span>
+                    <span class="led d1"></span><span class="led d2"></span><span class="led d3"></span>
+                    <span class="led d4"></span><span class="led d1"></span><span class="led d2"></span>
+                    <span class="led d3"></span><span class="led d4"></span>
+                </div>
+            </div>
+
+            <!-- 2. GLASS SHOWCASE -->
+            <div class="glass-window">
+<!-- Top roof rail where the claw trolley rides -->
+                <div class="roof-rail">
+                    <div class="rail-shine"></div>
+                </div>
+
+                <!-- Claw assembly: carriage + rope + 3-finger claw -->
+                <div class="claw-assembly" id="clawAssembly">
+                    <div class="carriage" aria-hidden="true"></div>
+                    <div class="rope" id="rope"></div>
+
+                    <svg class="claw" id="clawSvg" viewBox="0 0 64 60" width="52" height="60" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="clawMetal" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#dde1e6"/>
+                                <stop offset=".5" stop-color="#98a0aa"/>
+                                <stop offset="1" stop-color="#4d545e"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- hub / wrist -->
+                        <rect x="20" y="0" width="24" height="14" rx="5" fill="#3a3f46"/>
+                        <rect x="23" y="3" width="18" height="9" rx="3" fill="#6b7280"/>
+                        <!-- left finger -->
+                        <g id="armLeft" class="claw-finger" style="transform-origin:14px 18px">
+                            <path d="M14 18 C10 26 6 34 8 44 C18 50 24 48 18 46"
+                                  fill="none" stroke="url(#clawMetal)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </g>
+                        <!-- middle finger -->
+                        <g id="armMid" class="claw-finger">
+                            <path d="M32 18 C32 27 32 36 32 44 L32 47"
+                                  fill="none" stroke="url(#clawMetal)" stroke-width="8" stroke-linecap="round"/>
+                        </g>
+                        <!-- right finger -->
+                        <g id="armRight" class="claw-finger" style="transform-origin:50px 18px">
+                            <path d="M50 18 C54 26 58 34 56 44 C46 50 40 48 46 46"
+                                  fill="none" stroke="url(#clawMetal)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Prize drop chute -->
+                <div class="chute">
+                    <span class="chute-lips" aria-hidden="true">📥</span>
+                    <span class="chute-label">ထွက်ပေါက်</span>
+                </div>
+
+                <!-- Toys (rendered as SVG plush toys by script.js) -->
+                <div class="toys-container" id="toysContainer"></div>
+
+                <!-- Glass sheen overlay -->
+                <div class="glass-shine" aria-hidden="true"></div>
+            </div>
+
+            <!-- 3. CONTROL PANEL -->
+            <div class="controls">
+                <div class="led-strip" aria-hidden="true"></div>
+
+                <div class="coin-slot">
+                    <div class="coin-hole"></div>
+                    <span class="coin-label">INSERT<br>COIN</span>
+                </div>
+
+                <div class="ctrl-credit">
+                    <span class="credit-label">CREDIT</span>
+                    <span class="credit-value">❤ 1</span>
+                </div>
+
+                <button class="btn btn-left" onclick="moveClaw(-20)" title="ဘယ်ဘက် ရွှေ့ရန်">
+                    <span class="btn-arrow">◀</span>
+                </button>
+
+                <button class="btn btn-grab" onclick="grabToy()" title="အရုပ်ကောက်ရန်">
+                    ကောက် 🎯
+                </button>
+
+                <button class="btn btn-right" onclick="moveClaw(20)" title="ညာဘက် ရွှေ့ရန်">
+                    <span class="btn-arrow">▶</span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Floor glow -->
+        <div class="floor-glow" aria-hidden="true"></div>
+    </div>
+<!-- Prize Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-card">
+            <div class="prize-emoji" id="prizeEmoji">🧸</div>
+            <h2 id="prizeTitle">အရုပ်ရသွားပြီ!</h2>
+            <p id="prizeMessage">စာသားနေရာ</p>
+            <button class="close-btn" onclick="closeModal()">ကျေးဇူးပါ ❤️</button>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
