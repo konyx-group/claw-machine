@@ -1,172 +1,263 @@
 // ============================================================
-// LOVE CLAW MACHINE — game logic + hand-drawn plush-toy SVGs
+// LOVE CLAW MACHINE — game logic + realistic plush-toy SVGs
 // ============================================================
 
-/* ---- Prize data (each prize is drawn as a plush-toy SVG) ---- */
+/* ---- Prize data ---- */
 const toyData = [
-    { kind: 'bear',  name: 'ဝက်ဝံရုပ်လေး', msg: 'ဒီနေ့အတွက် Bonus အဖြစ် အနမ်း ၁၀၀၀ ရရှိပါသည်! 😘' },
-    { kind: 'bunny', name: 'ယုန်ပေါက်လေး', msg: 'Balance တွေ မကိုက်ရင် ခေါင်းစားမခံနဲ့နော်... ကိုယ် အမြဲရှိတယ်! 💕' },
-    { kind: 'cat',   name: 'ကြောင်ကလေး', msg: 'ကွန်ပျူတာ ကြည့်လွန်းလို့ မျက်စိညောင်းနေပြီမလား? ခဏနားပါဦး 🫶' },
-    { kind: 'fox',   name: 'မြေခွေးလေး', msg: 'ဒီနေ့ အလုပ်ဆင်းရင် မုန့်လိုက်ကျွေးမယ်! မြန်မြန်လုပ်တော့ 😁' },
-    { kind: 'gift',  name: 'လက်ဆောင်ပုံး', msg: 'Petty Cash Voucher: စိတ်ကြိုက် ဆိုးနွဲ့ခွင့် (၁) ကြိမ် ရရှိပါသည်! 🎫' },
-    { kind: 'heart', name: 'စိန်တုံးလေး', msg: 'မင်းက ကိုယ့်အတွက် အမွန်မြတ်ဆုံး Investment ပါပဲ! ❤️' }
+    { kind: 'bear',  name: 'ဝက်ဝံရုပ်လေး' },
+    { kind: 'bunny', name: 'ယုန်ပေါက်လေး' },
+    { kind: 'cat',   name: 'ကြောင်ကလေး' },
+    { kind: 'fox',   name: 'မြေခွေးလေး' },
+    { kind: 'gift',  name: 'လက်ဆောင်ပုံး' }
 ];
 
-/* ---- Hand-drawn plush toys ---- */
-const TOY_SVGS = {
+let toyUid = 0;
 
-/* soft teddy bear */
-bear: `
-<svg viewBox="0 0 64 72" aria-hidden="true">
+function toySvg(kind) {
+    const id = `t${++toyUid}`;
+    return TOY_BUILDERS[kind](id);
+}
+
+/* ---- Realistic plush toys (unique gradient ids per instance) ---- */
+const TOY_BUILDERS = {
+
+bear: (id) => `
+<svg viewBox="0 0 80 96" aria-hidden="true">
   <defs>
-    <radialGradient id="bearBody" cx=".5" cy=".4" r=".7">
-      <stop offset="0" stop-color="#c98d5f"/><stop offset="1" stop-color="#8a5a34"/>
+    <radialGradient id="${id}-fur" cx="35%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#e0b07a"/><stop offset=".55" stop-color="#c4894f"/>
+      <stop offset="1" stop-color="#8d5a2f"/>
     </radialGradient>
+    <radialGradient id="${id}-belly" cx="50%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#f6e2c4"/><stop offset="1" stop-color="#e8c49a"/>
+    </radialGradient>
+    <radialGradient id="${id}-snout" cx="50%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#f8e8d0"/><stop offset="1" stop-color="#e6c7a0"/>
+    </radialGradient>
+    <filter id="${id}-soft"><feGaussianBlur stdDeviation=".35"/></filter>
   </defs>
-  <ellipse cx="32" cy="68" rx="27" ry="5" fill="rgba(0,0,0,.18)"/>
-  <ellipse cx="32" cy="50" rx="21" ry="19" fill="url(#bearBody)"/>
-  <ellipse cx="32" cy="56" rx="13" ry="10" fill="#e8c193"/>
-  <circle cx="32" cy="26" r="17" fill="url(#bearBody)"/>
-  <circle cx="19" cy="12" r="6" fill="url(#bearBody)"/><circle cx="45" cy="12" r="6" fill="url(#bearBody)"/>
-  <circle cx="19" cy="12" r="2.6" fill="#d9a27a"/><circle cx="45" cy="12" r="2.6" fill="#d9a27a"/>
-  <ellipse cx="32" cy="33" rx="9" ry="6.5" fill="#e8c193"/>
-  <circle cx="25" cy="24" r="3.2" fill="#33271e"/><circle cx="39" cy="24" r="3.2" fill="#33271e"/>
-  <circle cx="26" cy="22.6" r=".9" fill="#fff"/><circle cx="40" cy="22.6" r=".9" fill="#fff"/>
-  <path d="M29 31 L35 31 L32 35 Z" fill="#5a4030"/>
-  <path d="M32 35 C30 38 34 38 32 39" stroke="#5a4030" stroke-width="1" fill="none"/>
-  <ellipse cx="13" cy="48" rx="6.5" ry="11" fill="url(#bearBody)" transform="rotate(18 13 48)"/>
-  <ellipse cx="51" cy="48" rx="6.5" ry="11" fill="url(#bearBody)" transform="rotate(-18 51 48)"/>
-  <ellipse cx="23" cy="66" rx="9" ry="6" fill="#8a5a34"/><ellipse cx="41" cy="66" rx="9" ry="6" fill="#8a5a34"/>
+  <ellipse cx="40" cy="90" rx="28" ry="5" fill="rgba(0,0,0,.18)"/>
+  <!-- legs -->
+  <ellipse cx="27" cy="82" rx="11" ry="9" fill="url(#${id}-fur)"/>
+  <ellipse cx="53" cy="82" rx="11" ry="9" fill="url(#${id}-fur)"/>
+  <ellipse cx="27" cy="84" rx="7" ry="4.5" fill="#f0d4b0"/>
+  <ellipse cx="53" cy="84" rx="7" ry="4.5" fill="#f0d4b0"/>
+  <!-- arms -->
+  <ellipse cx="14" cy="58" rx="9" ry="14" fill="url(#${id}-fur)" transform="rotate(22 14 58)"/>
+  <ellipse cx="66" cy="58" rx="9" ry="14" fill="url(#${id}-fur)" transform="rotate(-22 66 58)"/>
+  <ellipse cx="12" cy="66" rx="5" ry="4" fill="#f0d4b0" transform="rotate(22 12 66)"/>
+  <ellipse cx="68" cy="66" rx="5" ry="4" fill="#f0d4b0" transform="rotate(-22 68 66)"/>
+  <!-- body -->
+  <ellipse cx="40" cy="60" rx="23" ry="22" fill="url(#${id}-fur)"/>
+  <ellipse cx="40" cy="64" rx="14" ry="13" fill="url(#${id}-belly)"/>
+  <!-- ears -->
+  <circle cx="22" cy="18" r="9" fill="url(#${id}-fur)"/>
+  <circle cx="58" cy="18" r="9" fill="url(#${id}-fur)"/>
+  <circle cx="22" cy="18" r="4.5" fill="#f0c8a0"/>
+  <circle cx="58" cy="18" r="4.5" fill="#f0c8a0"/>
+  <!-- head -->
+  <circle cx="40" cy="32" r="20" fill="url(#${id}-fur)"/>
+  <ellipse cx="40" cy="40" rx="11" ry="9" fill="url(#${id}-snout)"/>
+  <!-- eyes -->
+  <ellipse cx="32" cy="29" rx="3.4" ry="4" fill="#2a1c14"/>
+  <ellipse cx="48" cy="29" rx="3.4" ry="4" fill="#2a1c14"/>
+  <circle cx="33.2" cy="27.5" r="1.1" fill="#fff"/>
+  <circle cx="49.2" cy="27.5" r="1.1" fill="#fff"/>
+  <!-- nose + mouth -->
+  <ellipse cx="40" cy="38" rx="3.2" ry="2.4" fill="#3a2a20"/>
+  <path d="M40 40.2 C37 44 34 43.5 33 42 M40 40.2 C43 44 46 43.5 47 42" stroke="#3a2a20" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+  <!-- cheek blush -->
+  <ellipse cx="25" cy="36" rx="3.5" ry="2" fill="#e8a090" opacity=".45"/>
+  <ellipse cx="55" cy="36" rx="3.5" ry="2" fill="#e8a090" opacity=".45"/>
+  <!-- soft fur highlights -->
+  <ellipse cx="30" cy="22" rx="5" ry="3" fill="rgba(255,255,255,.22)" filter="url(#${id}-soft)"/>
 </svg>`,
 
-/* white bunny with long pink-inner ears */
-bunny: `
-<svg viewBox="0 0 64 76" aria-hidden="true">
+bunny: (id) => `
+<svg viewBox="0 0 80 100" aria-hidden="true">
   <defs>
-    <radialGradient id="bunBody" cx=".5" cy=".4" r=".7">
-      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e8dfd4"/>
+    <radialGradient id="${id}-fur" cx="40%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#f4ebe3"/>
+      <stop offset="1" stop-color="#ddd0c4"/>
+    </radialGradient>
+    <radialGradient id="${id}-pink" cx="50%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#ffc4d4"/><stop offset="1" stop-color="#f09bb0"/>
     </radialGradient>
   </defs>
-  <ellipse cx="32" cy="71" rx="27" ry="5" fill="rgba(0,0,0,.18)"/>
-  <ellipse cx="32" cy="52" rx="20" ry="18" fill="url(#bunBody)"/>
-  <ellipse cx="32" cy="57" rx="12" ry="9" fill="#fdf6ee"/>
-  <circle cx="32" cy="27" r="16" fill="url(#bunBody)"/>
-  <ellipse cx="23" cy="12" rx="5" ry="13" fill="url(#bunBody)" transform="rotate(-12 23 12)"/>
-  <ellipse cx="41" cy="12" rx="5" ry="13" fill="url(#bunBody)" transform="rotate(12 41 12)"/>
-  <ellipse cx="23" cy="12" rx="2.6" ry="9" fill="#f3b7c2" transform="rotate(-12 23 12)"/>
-  <ellipse cx="41" cy="12" rx="2.6" ry="9" fill="#f3b7c2" transform="rotate(12 41 12)"/>
-  <ellipse cx="32" cy="33" rx="8" ry="6" fill="#fdf6ee"/>
-  <circle cx="25" cy="23" r="3" fill="#5a4440"/><circle cx="39" cy="23" r="3" fill="#5a4440"/>
-  <circle cx="26" cy="21.5" r=".9" fill="#fff"/><circle cx="40" cy="21.5" r=".9" fill="#fff"/>
-  <path d="M30 29 L34 29 L32 33 Z" fill="#ff9db0"/>
-  <path d="M32 33 L32 38" stroke="#ff9db0" stroke-width="1" fill="none"/>
-  <ellipse cx="12" cy="50" rx="6.5" ry="10" fill="url(#bunBody)" transform="rotate(15 12 50)"/>
-  <ellipse cx="52" cy="50" rx="6.5" ry="10" fill="url(#bunBody)" transform="rotate(-15 52 50)"/>
-  <ellipse cx="24" cy="69" rx="9" ry="5.5" fill="#fdf6ee"/><ellipse cx="40" cy="69" rx="9" ry="5.5" fill="#fdf6ee"/>
+  <ellipse cx="40" cy="94" rx="28" ry="5" fill="rgba(0,0,0,.16)"/>
+  <!-- ears -->
+  <ellipse cx="26" cy="16" rx="7" ry="18" fill="url(#${id}-fur)" transform="rotate(-14 26 16)"/>
+  <ellipse cx="54" cy="16" rx="7" ry="18" fill="url(#${id}-fur)" transform="rotate(14 54 16)"/>
+  <ellipse cx="26" cy="16" rx="3.2" ry="12" fill="url(#${id}-pink)" transform="rotate(-14 26 16)"/>
+  <ellipse cx="54" cy="16" rx="3.2" ry="12" fill="url(#${id}-pink)" transform="rotate(14 54 16)"/>
+  <!-- feet -->
+  <ellipse cx="28" cy="86" rx="11" ry="8" fill="url(#${id}-fur)"/>
+  <ellipse cx="52" cy="86" rx="11" ry="8" fill="url(#${id}-fur)"/>
+  <ellipse cx="28" cy="88" rx="6" ry="3.5" fill="#ffe8f0"/>
+  <ellipse cx="52" cy="88" rx="6" ry="3.5" fill="#ffe8f0"/>
+  <!-- arms -->
+  <ellipse cx="13" cy="62" rx="8" ry="13" fill="url(#${id}-fur)" transform="rotate(18 13 62)"/>
+  <ellipse cx="67" cy="62" rx="8" ry="13" fill="url(#${id}-fur)" transform="rotate(-18 67 62)"/>
+  <!-- body -->
+  <ellipse cx="40" cy="64" rx="21" ry="20" fill="url(#${id}-fur)"/>
+  <ellipse cx="40" cy="68" rx="12" ry="11" fill="#fff8f2"/>
+  <!-- head -->
+  <circle cx="40" cy="36" r="18" fill="url(#${id}-fur)"/>
+  <ellipse cx="40" cy="42" rx="9" ry="7" fill="#fff8f2"/>
+  <!-- eyes -->
+  <ellipse cx="32" cy="33" rx="3.2" ry="3.8" fill="#3a2e2a"/>
+  <ellipse cx="48" cy="33" rx="3.2" ry="3.8" fill="#3a2e2a"/>
+  <circle cx="33" cy="31.6" r="1" fill="#fff"/>
+  <circle cx="49" cy="31.6" r="1" fill="#fff"/>
+  <!-- nose / mouth -->
+  <ellipse cx="40" cy="40" rx="2.8" ry="2.2" fill="#ff8fad"/>
+  <path d="M40 42 L40 46 M40 46 C37.5 48 35 47 34 46 M40 46 C42.5 48 45 47 46 46" stroke="#d87892" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="26" cy="40" rx="3.2" ry="2" fill="#ffb8c8" opacity=".5"/>
+  <ellipse cx="54" cy="40" rx="3.2" ry="2" fill="#ffb8c8" opacity=".5"/>
+  <!-- fluffy cheek fluff -->
+  <ellipse cx="22" cy="42" rx="4" ry="3" fill="url(#${id}-fur)" opacity=".9"/>
+  <ellipse cx="58" cy="42" rx="4" ry="3" fill="url(#${id}-fur)" opacity=".9"/>
 </svg>`,
 
-/* orange tabby cat */
-cat: `
-<svg viewBox="0 0 64 72" aria-hidden="true">
+cat: (id) => `
+<svg viewBox="0 0 80 96" aria-hidden="true">
   <defs>
-    <radialGradient id="catBody" cx=".5" cy=".4" r=".7">
-      <stop offset="0" stop-color="#f8a94f"/><stop offset="1" stop-color="#d97c28"/>
+    <radialGradient id="${id}-fur" cx="35%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#ffc078"/><stop offset=".5" stop-color="#f09a45"/>
+      <stop offset="1" stop-color="#c96e22"/>
+    </radialGradient>
+    <radialGradient id="${id}-cream" cx="50%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#fff3e0"/><stop offset="1" stop-color="#f5d9b0"/>
     </radialGradient>
   </defs>
-  <ellipse cx="32" cy="67" rx="27" ry="5" fill="rgba(0,0,0,.18)"/>
-  <ellipse cx="32" cy="50" rx="21" ry="19" fill="url(#catBody)"/>
-  <ellipse cx="32" cy="56" rx="13" ry="10" fill="#ffe6c9"/>
-  <circle cx="32" cy="26" r="16" fill="url(#catBody)"/>
-  <path d="M20 14 L16 4 L24 14 Z" fill="url(#catBody)"/>
-  <path d="M44 14 L48 4 L40 14 Z" fill="url(#catBody)"/>
-  <path d="M20 14 L16 4 L24 14 Z" fill="#f5a8a0" transform="scale(.55) translate(9 4)"/>
-  <path d="M44 14 L48 4 L40 14 Z" fill="#f5a8a0" transform="scale(.55) translate(26 4)"/>
-  <circle cx="25" cy="21" r="3.4" fill="#40331f"/><circle cx="39" cy="21" r="3.4" fill="#40331f"/>
-  <circle cx="26" cy="19.6" r=".9" fill="#fff"/><circle cx="40" cy="19.6" r=".9" fill="#fff"/>
-  <path d="M28 28 L36 28 L32 31 Z" fill="#e58a8a"/>
-  <path d="M32 31 C30 34 34 34 32 35" stroke="#e58a8a" stroke-width="1" fill="none"/>
-  <path d="M18 27 L8 26 M46 27 L56 26 M18 29 L9 30 M46 29 L55 30" stroke="#f5f5f5" stroke-width="1.4"/>
-  <ellipse cx="12" cy="49" rx="6.5" ry="11" fill="url(#catBody)" transform="rotate(20 12 49)"/>
-  <ellipse cx="52" cy="49" rx="6.5" ry="11" fill="url(#catBody)" transform="rotate(-20 52 49)"/>
-  <path d="M54 50 C60 44 62 52 60 60" stroke="#d97c28" stroke-width="6" stroke-linecap="round" fill="none"/>
-  <ellipse cx="23" cy="66" rx="9" ry="6" fill="#d97c28"/><ellipse cx="41" cy="66" rx="9" ry="6" fill="#d97c28"/>
-</svg>`,
-/* orange fox plush with fluffy tail */
-fox: `
-<svg viewBox="0 0 64 78" aria-hidden="true">
-  <defs>
-    <radialGradient id="foxBody" cx=".5" cy=".4" r=".7">
-      <stop offset="0" stop-color="#f0904a"/><stop offset="1" stop-color="#c96b24"/>
-    </radialGradient>
-  </defs>
-  <ellipse cx="32" cy="72" rx="28" ry="5" fill="rgba(0,0,0,.18)"/>
-  <path d="M50 48 C60 42 63 52 59 60 L52 54 C46 52 44 58 48 64 L52 58 Z" fill="url(#foxBody)"/>
-  <path d="M56 54 C62 46 63 56 60 62 L55 58 Z" fill="#fff8ee"/>
-  <ellipse cx="32" cy="50" rx="21" ry="19" fill="url(#foxBody)"/>
-  <ellipse cx="32" cy="56" rx="13" ry="10" fill="#fff2e2"/>
-  <circle cx="32" cy="26" r="16" fill="url(#foxBody)"/>
-  <path d="M20 14 L15 3 L25 15 Z" fill="url(#foxBody)"/>
-  <path d="M44 14 L49 3 L39 15 Z" fill="url(#foxBody)"/>
-  <path d="M20 14 L15 3 L25 15 Z" fill="#2b2b30" transform="scale(.5) translate(10 7)"/>
-  <path d="M44 14 L49 3 L39 15 Z" fill="#2b2b30" transform="scale(.5) translate(24 7)"/>
-  <path d="M27 16 L38 16 L32 33 Z" fill="#fff8ee"/>
-  <circle cx="25" cy="21" r="3.2" fill="#33271e"/><circle cx="39" cy="21" r="3.2" fill="#33271e"/>
-  <circle cx="26" cy="19.6" r=".9" fill="#fff"/><circle cx="40" cy="19.6" r=".9" fill="#fff"/>
-  <path d="M32 27 C30 31 34 31 32 33" fill="#33271e"/>
-  <ellipse cx="12" cy="49" rx="6" ry="11" fill="url(#foxBody)" transform="rotate(18 12 49)"/>
-  <ellipse cx="28" cy="50" rx="6.5" ry="11" fill="url(#foxBody)" transform="rotate(-10 28 50)"/>
-  <ellipse cx="23" cy="69" rx="9" ry="5.5" fill="#fff2e2"/><ellipse cx="41" cy="69" rx="9" ry="5.5" fill="#fff2e2"/>
+  <ellipse cx="40" cy="90" rx="28" ry="5" fill="rgba(0,0,0,.16)"/>
+  <!-- tail -->
+  <path d="M62 58 C74 48 78 62 72 74 C68 82 64 78 66 72 C68 64 64 58 62 58" fill="url(#${id}-fur)"/>
+  <path d="M68 66 C72 60 74 68 70 74" fill="#fff0d8" opacity=".55"/>
+  <!-- feet -->
+  <ellipse cx="27" cy="82" rx="10" ry="8" fill="url(#${id}-fur)"/>
+  <ellipse cx="53" cy="82" rx="10" ry="8" fill="url(#${id}-fur)"/>
+  <!-- arms -->
+  <ellipse cx="13" cy="58" rx="8" ry="13" fill="url(#${id}-fur)" transform="rotate(20 13 58)"/>
+  <ellipse cx="67" cy="58" rx="8" ry="13" fill="url(#${id}-fur)" transform="rotate(-20 67 58)"/>
+  <!-- body -->
+  <ellipse cx="40" cy="60" rx="22" ry="21" fill="url(#${id}-fur)"/>
+  <ellipse cx="40" cy="64" rx="13" ry="12" fill="url(#${id}-cream)"/>
+  <!-- stripes -->
+  <path d="M28 48 Q40 52 52 48" stroke="#d47828" stroke-width="2.2" fill="none" opacity=".45"/>
+  <path d="M26 55 Q40 60 54 55" stroke="#d47828" stroke-width="2" fill="none" opacity=".35"/>
+  <!-- ears -->
+  <path d="M24 20 L18 4 L32 18 Z" fill="url(#${id}-fur)"/>
+  <path d="M56 20 L62 4 L48 18 Z" fill="url(#${id}-fur)"/>
+  <path d="M24 18 L20 8 L30 17 Z" fill="#f5a8a0"/>
+  <path d="M56 18 L60 8 L50 17 Z" fill="#f5a8a0"/>
+  <!-- head -->
+  <circle cx="40" cy="32" r="18" fill="url(#${id}-fur)"/>
+  <ellipse cx="40" cy="38" rx="8" ry="6" fill="url(#${id}-cream)"/>
+  <!-- eyes -->
+  <ellipse cx="32" cy="29" rx="3.6" ry="4.2" fill="#2c2118"/>
+  <ellipse cx="48" cy="29" rx="3.6" ry="4.2" fill="#2c2118"/>
+  <ellipse cx="32" cy="29" rx="1.4" ry="2.2" fill="#7dcf6a" opacity=".55"/>
+  <ellipse cx="48" cy="29" rx="1.4" ry="2.2" fill="#7dcf6a" opacity=".55"/>
+  <circle cx="33.3" cy="27.4" r="1" fill="#fff"/>
+  <circle cx="49.3" cy="27.4" r="1" fill="#fff"/>
+  <!-- nose / mouth / whiskers -->
+  <path d="M37 36 L43 36 L40 39 Z" fill="#e58a8a"/>
+  <path d="M40 39 C37 43 35 42 34 41 M40 39 C43 43 45 42 46 41" stroke="#c07070" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+  <path d="M22 34 L10 32 M22 37 L11 38 M58 34 L70 32 M58 37 L69 38" stroke="#fff8ee" stroke-width="1.5" stroke-linecap="round"/>
+  <ellipse cx="26" cy="36" rx="3" ry="1.8" fill="#f5a090" opacity=".4"/>
+  <ellipse cx="54" cy="36" rx="3" ry="1.8" fill="#f5a090" opacity=".4"/>
 </svg>`,
 
-/* wrapped gift box with golden ribbon */
-gift: `
-<svg viewBox="0 0 64 58" aria-hidden="true">
+fox: (id) => `
+<svg viewBox="0 0 80 100" aria-hidden="true">
   <defs>
-    <linearGradient id="giftBox" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#e8484b"/><stop offset="1" stop-color="#a9272b"/>
+    <radialGradient id="${id}-fur" cx="35%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#ff9a55"/><stop offset=".55" stop-color="#e87330"/>
+      <stop offset="1" stop-color="#b85118"/>
+    </radialGradient>
+    <radialGradient id="${id}-cream" cx="50%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#fff8ee"/><stop offset="1" stop-color="#f3e0c8"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="40" cy="94" rx="28" ry="5" fill="rgba(0,0,0,.16)"/>
+  <!-- bushy tail -->
+  <path d="M58 60 C74 48 80 64 72 80 C66 90 58 84 60 74 C62 66 58 60 58 60 Z" fill="url(#${id}-fur)"/>
+  <path d="M66 70 C74 60 76 72 70 80 C67 84 64 78 66 70 Z" fill="url(#${id}-cream)"/>
+  <!-- feet -->
+  <ellipse cx="28" cy="86" rx="10" ry="8" fill="url(#${id}-cream)"/>
+  <ellipse cx="52" cy="86" rx="10" ry="8" fill="url(#${id}-cream)"/>
+  <!-- arms -->
+  <ellipse cx="13" cy="60" rx="8" ry="13" fill="url(#${id}-fur)" transform="rotate(18 13 60)"/>
+  <ellipse cx="67" cy="60" rx="8" ry="13" fill="url(#${id}-fur)" transform="rotate(-18 67 60)"/>
+  <!-- body -->
+  <ellipse cx="40" cy="62" rx="22" ry="21" fill="url(#${id}-fur)"/>
+  <ellipse cx="40" cy="66" rx="13" ry="12" fill="url(#${id}-cream)"/>
+  <!-- ears -->
+  <path d="M24 20 L16 2 L34 18 Z" fill="url(#${id}-fur)"/>
+  <path d="M56 20 L64 2 L46 18 Z" fill="url(#${id}-fur)"/>
+  <path d="M24 18 L19 6 L31 17 Z" fill="#2a2a30"/>
+  <path d="M56 18 L61 6 L49 17 Z" fill="#2a2a30"/>
+  <!-- head -->
+  <circle cx="40" cy="34" r="18" fill="url(#${id}-fur)"/>
+  <path d="M28 22 L52 22 L40 48 Z" fill="url(#${id}-cream)"/>
+  <!-- eyes -->
+  <ellipse cx="32" cy="30" rx="3.3" ry="3.8" fill="#2a1c14"/>
+  <ellipse cx="48" cy="30" rx="3.3" ry="3.8" fill="#2a1c14"/>
+  <circle cx="33.2" cy="28.6" r="1" fill="#fff"/>
+  <circle cx="49.2" cy="28.6" r="1" fill="#fff"/>
+  <!-- nose -->
+  <ellipse cx="40" cy="40" rx="3" ry="2.4" fill="#2a1c14"/>
+  <path d="M40 42.2 C37 46 35 45 34 44 M40 42.2 C43 46 45 45 46 44" stroke="#2a1c14" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+</svg>`,
+
+gift: (id) => `
+<svg viewBox="0 0 80 78" aria-hidden="true">
+  <defs>
+    <linearGradient id="${id}-box" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff6b6e"/><stop offset="1" stop-color="#c23036"/>
+    </linearGradient>
+    <linearGradient id="${id}-lid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff8588"/><stop offset="1" stop-color="#d6454a"/>
+    </linearGradient>
+    <linearGradient id="${id}-gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#e0a820"/>
     </linearGradient>
   </defs>
-  <ellipse cx="32" cy="53" rx="25" ry="5" fill="rgba(0,0,0,.2)"/>
-  <rect x="12" y="22" width="40" height="30" rx="2" fill="url(#giftBox)" stroke="#7d1b1e" stroke-width="1"/>
-  <rect x="12" y="15" width="40" height="9" rx="2" fill="url(#giftBox)" stroke="#7d1b1e" stroke-width="1"/>
-  <path d="M27 15 L27 52 M37 15 L37 52" stroke="#ffd24d" stroke-width="3"/>
-  <path d="M12 24 L52 24" stroke="#ffd24d" stroke-width="3"/>
-  <path d="M27 15 C17 7 14 7 22 5 C18 12 15 12 20 14" fill="#ffd24d"/>
-  <path d="M37 15 C47 7 50 7 42 5 C46 12 49 12 44 14" fill="#ffd24d"/>
-  <rect x="29" y="9" width="6" height="6" rx="1" fill="#ffd24d"/>
-</svg>`,
-
-/* pink heart plush ("diamond" prize) */
-heart: `
-<svg viewBox="0 0 64 64" aria-hidden="true">
-  <defs>
-    <radialGradient id="heartBody" cx=".45" cy=".4" r=".7">
-      <stop offset="0" stop-color="#ff9fc0"/><stop offset="1" stop-color="#e0608f"/>
-    </radialGradient>
-  </defs>
-  <ellipse cx="32" cy="58" rx="27" ry="5" fill="rgba(0,0,0,.18)"/>
-  <circle cx="23" cy="27" r="14" fill="url(#heartBody)"/>
-  <circle cx="41" cy="27" r="14" fill="url(#heartBody)"/>
-  <path d="M23 34 L41 34 L32 56 Z" fill="url(#heartBody)"/>
-  <circle cx="31" cy="40" r="3.2" fill="#b0446f"/><circle cx="33" cy="40" r="3.2" fill="#b0446f"/>
-  <circle cx="32" cy="46" r="2.4" fill="#fff"/>
-  <path d="M31 33 C34 29 37 29 34 33 Z" stroke="#9e3d63" stroke-width="1.4" fill="none"/>
-  <ellipse cx="25" cy="19" rx="5" ry="3.4" fill="rgba(255,255,255,.5)" transform="rotate(-25 25 19)"/>
+  <ellipse cx="40" cy="72" rx="28" ry="5" fill="rgba(0,0,0,.18)"/>
+  <!-- box body with paper texture feel -->
+  <rect x="14" y="30" width="52" height="38" rx="3" fill="url(#${id}-box)" stroke="#8e1f24" stroke-width="1.2"/>
+  <rect x="16" y="32" width="10" height="34" fill="rgba(255,255,255,.08)"/>
+  <!-- lid -->
+  <rect x="12" y="20" width="56" height="14" rx="3" fill="url(#${id}-lid)" stroke="#8e1f24" stroke-width="1.2"/>
+  <!-- ribbon -->
+  <rect x="35" y="20" width="10" height="48" fill="url(#${id}-gold)"/>
+  <rect x="12" y="24" width="56" height="6" fill="url(#${id}-gold)"/>
+  <!-- bow -->
+  <path d="M34 20 C22 8 16 10 24 6 C20 16 18 18 26 20 Z" fill="url(#${id}-gold)"/>
+  <path d="M46 20 C58 8 64 10 56 6 C60 16 62 18 54 20 Z" fill="url(#${id}-gold)"/>
+  <rect x="36" y="12" width="8" height="10" rx="2" fill="#f0c030"/>
+  <!-- soft shadow under lid -->
+  <rect x="14" y="33" width="52" height="3" fill="rgba(0,0,0,.12)"/>
 </svg>`
 };
+
 /* ============================================================
    GAME STATE
    ============================================================ */
 let clawX = 130;
 let isBusy = false;
 let activeToys = [];
+let refillAfterModal = false;
+
+const WIN_CHANCE = 0.62;
 
 const clawAssembly = document.getElementById('clawAssembly');
 const clawSvg       = document.getElementById('clawSvg');
 const rope          = document.getElementById('rope');
 const toysContainer = document.getElementById('toysContainer');
+const prizeMessage  = document.getElementById('prizeMessage');
 
-/* Open / close the 3 fingers */
 function setGrip(closed) {
     clawSvg.classList.toggle('grip', closed);
 }
@@ -177,13 +268,13 @@ function setGrip(closed) {
 function initToys() {
     toysContainer.innerHTML = '';
     activeToys = [];
-    const positions = [75, 120, 165, 210, 255, 298];
+    const positions = [90, 137, 184, 231, 275];
 
     toyData.forEach((data, index) => {
         const toyEl = document.createElement('div');
         toyEl.className = 'toy';
         toyEl.style.left = positions[index] + 'px';
-        toyEl.innerHTML = TOY_SVGS[data.kind];
+        toyEl.innerHTML = toySvg(data.kind);
         toysContainer.appendChild(toyEl);
 
         activeToys.push({ element: toyEl, x: positions[index], data: data });
@@ -196,8 +287,8 @@ function initToys() {
 function moveClaw(step) {
     if (isBusy) return;
     clawX += step;
-    if (clawX < 70) clawX = 70;                  // don't pass the left chute
-    if (clawX > 292) clawX = 292;                // reach the rightmost toy
+    if (clawX < 70) clawX = 70;
+    if (clawX > 292) clawX = 292;
     clawAssembly.style.left = clawX + 'px';
 }
 
@@ -207,47 +298,38 @@ function moveClaw(step) {
 function grabToy() {
     if (isBusy) return;
     isBusy = true;
-    setGrip(false);                 // fingers open
+    setGrip(false);
+    clawAssembly.classList.add('working');
 
-    // 1) Lower the claw
+    clawAssembly.style.setProperty('--rope-height', '210px');
     rope.style.height = '210px';
 
     setTimeout(() => {
-        // 2) At the bottom: check a prize is under the claw, then clamp shut
-        const caught = activeToys.find(toy => Math.abs(toy.x - clawX) < 28);
-        setGrip(true);              // fingers close onto the prize
+        const target = activeToys.find(toy => Math.abs(toy.x - clawX) < 28);
+        const caught = target && Math.random() < WIN_CHANCE ? target : null;
+        setGrip(true);
 
         setTimeout(() => {
-            // 3) Lift back up (carrying the prize if caught)
-            rope.style.height = '20px';
             if (caught) {
-                caught.element.style.transition = 'all 0.45s ease';
-                caught.element.style.bottom = '62px';
-                caught.element.style.left = clawX + 'px';
-            } else {
-                setTimeout(() => setGrip(false), 250);   // empty grab: let go
+                attachToyToClaw(caught);
+                caught.element.getBoundingClientRect();
             }
+            if (target && !caught) target.element.classList.add('slipped');
+            clawAssembly.style.setProperty('--rope-height', '20px');
+            rope.style.height = '20px';
+            if (!caught) setTimeout(() => setGrip(false), 250);
 
             setTimeout(() => {
-                // 4) Travel over to the drop chute (left)
                 clawAssembly.style.left = '20px';
-                if (caught) {
-                    caught.element.style.transition = 'left 0.9s linear';
-                    caught.element.style.left = '20px';
-                }
 
                 setTimeout(() => {
-                    // 5) Release the prize into the chute
                     if (caught) {
-                        setGrip(false);   // fingers open
-                        caught.element.style.transition = 'bottom 0.5s ease-in, opacity 0.5s ease';
-                        caught.element.style.bottom = '12px';
+                        setGrip(false);
+                        caught.element.classList.add('dropping');
                         caught.element.style.opacity = '0';
-
-                        setTimeout(() => showPrize(caught.data), 480);
+                        setTimeout(() => showPrize(caught.data), 520);
                     } else {
-                        alert("ဟာကွာ... အရုပ်မမိလိုက်ဘူး! နောက်တစ်ခါ ထပ်စမ်းကြည့်ပါဦး 😜");
-                        resetClaw();
+                        showFailure(Boolean(target));
                     }
                 }, 900);
 
@@ -258,29 +340,62 @@ function grabToy() {
     }, 1000);
 }
 
+function attachToyToClaw(toy) {
+    toy.element.classList.add('carried-toy');
+    toy.element.style.left = '';
+    toy.element.style.bottom = '';
+    clawAssembly.appendChild(toy.element);
+    activeToys = activeToys.filter(item => item !== toy);
+}
+
 /* ============================================================
    PRIZE MODAL
    ============================================================ */
 function showPrize(data) {
-    document.getElementById('prizeEmoji').innerHTML   = TOY_SVGS[data.kind];
-    document.getElementById('prizeTitle').innerText   = data.name + ' ရရှိသွားပါပြီ!';
-    document.getElementById('prizeMessage').innerText = data.msg;
+    refillAfterModal = true;
+    document.getElementById('modalCard').classList.remove('failure');
+    document.getElementById('prizeEmoji').innerHTML = toySvg(data.kind);
+    document.getElementById('prizeTitle').innerText = 'Congratulations အရုပ်ရပါပြီ';
+    prizeMessage.hidden = true;
+    prizeMessage.innerText = '';
+    document.getElementById('modalButton').innerText = 'ကျေးဇူးပါ';
     document.getElementById('modalOverlay').classList.add('active');
 
     confetti({ particleCount: 90, spread: 75, origin: { y: 0.6 } });
 }
 
+function showFailure(wasAligned) {
+    refillAfterModal = false;
+    document.getElementById('modalCard').classList.add('failure');
+    document.getElementById('prizeEmoji').innerHTML = `
+<svg viewBox="0 0 64 64" width="72" height="72" aria-hidden="true">
+  <circle cx="32" cy="32" r="28" fill="#e8eef8" stroke="#8aa0c8" stroke-width="3"/>
+  <circle cx="22" cy="26" r="3.5" fill="#5a6f98"/>
+  <circle cx="42" cy="26" r="3.5" fill="#5a6f98"/>
+  <path d="M22 42 C26 36 38 36 42 42" stroke="#5a6f98" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>`;
+    document.getElementById('prizeTitle').innerText = 'မရလိုက်ဘူးနော်!';
+    prizeMessage.hidden = false;
+    prizeMessage.innerText = wasAligned
+        ? 'အရုပ်က လွတ်ကျသွားတယ်။ နောက်တစ်ခါ ထပ်ကြိုးစားကြည့်ပါဦး!'
+        : 'လက်တံကို အရုပ်နဲ့တည့်အောင် ရွှေ့ပြီး နောက်တစ်ခါ ထပ်ကြိုးစားကြည့်ပါဦး!';
+    document.getElementById('modalButton').innerText = 'ထပ်ကြိုးစားမယ်';
+    document.getElementById('modalOverlay').classList.add('active');
+}
+
 function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
     resetClaw();
-    initToys();               // refill the showcase
+    if (refillAfterModal) initToys();
 }
 
 function resetClaw() {
     clawX = 130;
     clawAssembly.style.left = clawX + 'px';
+    clawAssembly.style.setProperty('--rope-height', '20px');
     rope.style.height = '20px';
     setGrip(false);
+    clawAssembly.classList.remove('working');
     isBusy = false;
 }
 

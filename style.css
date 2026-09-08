@@ -114,6 +114,7 @@ body {
 .glass-window {
     position: relative;
     height: 320px;
+    overflow: hidden;
     background:
         radial-gradient(circle at 82% 30%, rgba(255,255,255,0.25) 0%, transparent 45%),
         linear-gradient(180deg, #fdf7ef 0%, #f6ead8 30%, #eedfca 100%);
@@ -146,10 +147,11 @@ body {
 
 /* Claw assembly — flex column: claw slides DOWN when rope grows */
 .claw-assembly {
+    --rope-height: 20px;
     position: absolute;
     top: -4px;
     left: 130px; /* initial position */
-    width: 52px;
+    width: 58px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -157,66 +159,141 @@ body {
     z-index: 10;
 }
 
-/* little wheeled trolley riding the rail */
+.claw-assembly.working {
+    transition: left 0.9s ease-in-out;
+}
+
+/* wheeled trolley + pulley on the roof rail */
 .carriage {
     position: absolute;
     top: 0;
-    left: -2px;
-    width: 56px;
-    height: 18px;
-    background: linear-gradient(180deg, #4a4f57, #2a2d33);
-    border: 2px solid #101114;
-    border-radius: 6px;
+    left: -4px;
+    width: 66px;
+    height: 20px;
+    background:
+        linear-gradient(180deg, #6a727c 0%, #3a414a 45%, #1d2127 100%);
+    border: 2px solid #0d0f12;
+    border-radius: 7px;
     z-index: 3;
+    box-shadow:
+        inset 0 2px 1px rgba(255,255,255,.28),
+        inset 0 -3px 4px rgba(0,0,0,.45),
+        0 2px 4px rgba(0,0,0,.35);
 }
 
-.carriage::before,
-.carriage::after {
+.carriage-wheel {
+    position: absolute;
+    top: -5px;
+    width: 14px;
+    height: 10px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #2a3038, #101318);
+    border: 1px solid #000;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
+}
+.carriage-wheel.left  { left: 6px; }
+.carriage-wheel.right { right: 6px; }
+
+.carriage-pulley {
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    width: 16px;
+    height: 12px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 30%, #d5dbe3 0%, #8b949f 45%, #2f363f 100%);
+    border: 2px solid #12151a;
+    box-shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+
+.carriage-pulley::after {
     content: '';
     position: absolute;
-    top: -3px;
-    width: 18px;
-    height: 6px;
-    border-radius: 3px;
-    background: #20242a;
+    inset: 3px;
+    border-radius: 50%;
+    background: #1a1e24;
+    box-shadow: inset 0 0 0 1.5px #7f8893;
 }
-.carriage::before { left: 3px; }
-.carriage::after  { right: 3px; }
 
-/* rope that lowers the claw */
+/* steel cable that lowers the claw */
 .rope {
-    margin-top: 14px;
-    width: 5px;
-    height: 20px; /* stretches down (JS sets 210px when grabbing) */
-    background: linear-gradient(90deg, #5b6168, #2b2f35, #5b6168);
+    position: relative;
+    margin-top: 16px;
+    width: 6px;
+    height: 20px;
+    border-radius: 3px;
+    overflow: hidden;
     transition: height 1s ease-in-out;
-    box-shadow: 0 0 2px rgba(0,0,0,0.4);
+    background:
+        repeating-linear-gradient(
+            180deg,
+            #9aa3ae 0 3px,
+            #5c6570 3px 6px,
+            #d5dbe2 6px 7px,
+            #3a424c 7px 10px
+        );
+    box-shadow:
+        inset 1px 0 0 rgba(255,255,255,.35),
+        inset -1px 0 0 rgba(0,0,0,.45),
+        1px 0 2px rgba(0,0,0,.25);
 }
 
-/* ---- 3-FINGER CLAW (SVG) ---- */
+.rope-core {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+        rgba(0,0,0,.35) 0%,
+        transparent 35%,
+        rgba(255,255,255,.25) 50%,
+        transparent 65%,
+        rgba(0,0,0,.4) 100%);
+    pointer-events: none;
+}
+
+.rope-sheen {
+    position: absolute;
+    top: 0;
+    left: 1px;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.05));
+    border-radius: 1px;
+    pointer-events: none;
+}
+
+/* ---- industrial 3-finger claw ---- */
 .claw {
-    width: 52px;
-    height: 60px;
+    width: 58px;
+    height: 64px;
+    margin-top: -2px;
+    filter: drop-shadow(0 3px 2px rgba(0,0,0,.35));
 }
 
 .claw-finger {
     transform-box: view-box;
-    transition: transform 0.35s ease;
+    transition: transform 0.38s cubic-bezier(.2,.8,.2,1);
 }
 
 #armLeft {
-    transform-origin: 14px 18px;
-    transform: rotate(-16deg);
+    transform-origin: 24px 22px;
+    transform: rotate(-20deg);
+}
+
+#armMid {
+    transform-origin: 36px 22px;
 }
 
 #armRight {
-    transform-origin: 50px 18px;
-    transform: rotate(16deg);
+    transform-origin: 48px 22px;
+    transform: rotate(20deg);
 }
 
-/* when gripping, the two outer fingers swing inward to pinch the prize */
-.claw.grip #armLeft  { transform: rotate(14deg); }
-.claw.grip #armRight { transform: rotate(-14deg); }
+/* grip: outer arms pinch inward like a real claw */
+.claw.grip #armLeft  { transform: rotate(16deg); }
+.claw.grip #armRight { transform: rotate(-16deg); }
+.claw.grip #armMid   { transform: translateY(2px); }
 
 /* Prize drop chute (bottom-left opening) */
 .chute {
@@ -290,8 +367,8 @@ body {
 
 .toy {
     position: absolute;
-    width: 54px;
-    height: 70px;
+    width: 58px;
+    height: 74px;
     bottom: 0;
     left: 0;
     transition: all 0.5s ease;
@@ -299,10 +376,52 @@ body {
 }
 
 .toy svg {
-    width: 54px;
-    height: 70px;
+    width: 58px;
+    height: 74px;
     display: block;
-    filter: drop-shadow(0 5px 4px rgba(0,0,0,0.35));
+    filter: drop-shadow(0 6px 5px rgba(0,0,0,0.32));
+}
+
+.toy.slipped {
+    animation: toy-slip 0.65s ease-out;
+}
+
+@keyframes toy-slip {
+    0%   { transform: translateY(0) rotate(0); }
+    35%  { transform: translateY(-13px) rotate(-8deg); }
+    70%  { transform: translateY(2px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0); }
+}
+
+/* A won toy becomes part of the claw so it follows every movement. */
+.claw-assembly .carried-toy {
+    position: absolute;
+    top: calc(var(--rope-height) + 48px);
+    left: 50%;
+    bottom: auto;
+    width: 52px;
+    height: 66px;
+    transform: translateX(-50%) rotate(3deg);
+    transform-origin: top center;
+    transition: top 1s ease-in-out, transform 0.35s ease, opacity 0.5s ease;
+    z-index: -1;
+    animation: prize-sway 0.8s ease-in-out infinite alternate;
+}
+
+.claw-assembly .carried-toy svg {
+    width: 52px;
+    height: 66px;
+}
+
+.claw-assembly .carried-toy.dropping {
+    top: 280px;
+    transform: translateX(-50%) rotate(16deg);
+    animation: none;
+}
+
+@keyframes prize-sway {
+    from { transform: translateX(-50%) rotate(-4deg); }
+    to   { transform: translateX(-50%) rotate(4deg); }
 }
 
 /* Glass sheen overlay */
@@ -495,21 +614,44 @@ body {
     max-width: 320px;
     width: 85%;
     box-shadow: 0 10px 25px rgba(210, 60, 90, 0.35);
+    transform: scale(0.88);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-card {
+    transform: scale(1);
+}
+
+.modal-card.failure {
+    background: linear-gradient(180deg, #fff 0%, #e9f0ff 100%);
+    border-color: #7188bd;
+}
+
+.modal-card.failure h2 {
+    color: #52699f;
+}
+
+.modal-card.failure .close-btn {
+    background: linear-gradient(180deg, #829bd2, #52699f);
 }
 
 .modal-card .prize-emoji {
-    font-size: 64px;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 6px 6px rgba(0,0,0,0.25));
+    margin-bottom: 10px;
+    min-height: 104px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* the won plush toy (SVG) inside the modal */
 .modal-card .prize-emoji svg {
-    width: 96px;
-    height: 104px;
+    width: 112px;
+    height: 120px;
     display: block;
-    margin: 0 auto;
     filter: drop-shadow(0 8px 8px rgba(0,0,0,0.3));
+}
+
+.modal-card p[hidden] {
+    display: none;
 }
 
 .modal-card h2 {
