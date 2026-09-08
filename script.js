@@ -248,9 +248,11 @@ gift: (id) => `
 let clawX = 130;
 let isBusy = false;
 let activeToys = [];
-let refillAfterModal = false;
+let grabTimer = 0;
 
-const WIN_CHANCE = 0.10;
+const WIN_CHANCE = 0.25;
+/* How close claw left must be to toy left to count as a direct hit */
+const HIT_RANGE = 18;
 
 const clawAssembly = document.getElementById('clawAssembly');
 const clawSvg       = document.getElementById('clawSvg');
@@ -262,10 +264,21 @@ function setGrip(closed) {
     clawSvg.classList.toggle('grip', closed);
 }
 
+function clearCarriedToys() {
+    clawAssembly.querySelectorAll('.carried-toy').forEach(el => el.remove());
+}
+
+function clearSlips() {
+    toysContainer.querySelectorAll('.toy.slipped').forEach(el => {
+        el.classList.remove('slipped');
+    });
+}
+
 /* ============================================================
    SPAWN THE PLUSH TOYS
    ============================================================ */
 function initToys() {
+    clearCarriedToys();
     toysContainer.innerHTML = '';
     activeToys = [];
     const positions = [90, 137, 184, 231, 275];
@@ -297,39 +310,59 @@ function moveClaw(step) {
    ============================================================ */
 function grabToy() {
     if (isBusy) return;
+    if (!activeToys.length) initToys();
+
     isBusy = true;
+    clearSlips();
     setGrip(false);
     clawAssembly.classList.add('working');
+
+    const runId = ++grabTimer;
+    let nearMiss = false;
 
     clawAssembly.style.setProperty('--rope-height', '210px');
     rope.style.height = '210px';
 
     setTimeout(() => {
-        const target = activeToys.find(toy => Math.abs(toy.x - clawX) < 28);
+        if (runId !== grabTimer) return;
+
+        // Must be centered on a toy, then only 10% chance to actually catch it
+        const target = activeToys.find(toy => Math.abs(toy.x - clawX) <= HIT_RANGE);
         const caught = target && Math.random() < WIN_CHANCE ? target : null;
+        nearMiss = Boolean(target) && !caught;
         setGrip(true);
 
         setTimeout(() => {
+            if (runId !== grabTimer) return;
+
             if (caught) {
                 attachToyToClaw(caught);
                 caught.element.getBoundingClientRect();
+            } else if (target) {
+                target.element.classList.add('slipped');
             }
-            if (target && !caught) target.element.classList.add('slipped');
+
             clawAssembly.style.setProperty('--rope-height', '20px');
             rope.style.height = '20px';
             if (!caught) setTimeout(() => setGrip(false), 250);
 
             setTimeout(() => {
+                if (runId !== grabTimer) return;
                 clawAssembly.style.left = '20px';
 
                 setTimeout(() => {
+                    if (runId !== grabTimer) return;
+
                     if (caught) {
                         setGrip(false);
                         caught.element.classList.add('dropping');
                         caught.element.style.opacity = '0';
-                        setTimeout(() => showPrize(caught.data), 520);
+                        setTimeout(() => {
+                            if (runId !== grabTimer) return;
+                            showPrize(caught.data);
+                        }, 520);
                     } else {
-                        showFailure(Boolean(target));
+                        showFailure(nearMiss);
                     }
                 }, 900);
 
@@ -342,8 +375,10 @@ function grabToy() {
 
 function attachToyToClaw(toy) {
     toy.element.classList.add('carried-toy');
+    toy.element.classList.remove('slipped');
     toy.element.style.left = '';
     toy.element.style.bottom = '';
+    toy.element.style.opacity = '';
     clawAssembly.appendChild(toy.element);
     activeToys = activeToys.filter(item => item !== toy);
 }
@@ -352,7 +387,6 @@ function attachToyToClaw(toy) {
    PRIZE MODAL
    ============================================================ */
 function showPrize(data) {
-    refillAfterModal = true;
     document.getElementById('modalCard').classList.remove('failure');
     document.getElementById('prizeEmoji').innerHTML = toySvg(data.kind);
     document.getElementById('prizeTitle').innerText = 'Congratulations အရုပ်ရပါပြီ';
@@ -365,7 +399,6 @@ function showPrize(data) {
 }
 
 function showFailure(wasAligned) {
-    refillAfterModal = false;
     document.getElementById('modalCard').classList.add('failure');
     document.getElementById('prizeEmoji').innerHTML = `
 <svg viewBox="0 0 64 64" width="72" height="72" aria-hidden="true">
@@ -378,18 +411,21 @@ function showFailure(wasAligned) {
     prizeMessage.hidden = false;
     prizeMessage.innerText = wasAligned
         ? 'အရုပ်က လွတ်ကျသွားတယ်။ နောက်တစ်ခါ ထပ်ကြိုးစားကြည့်ပါဦး!'
-        : 'လက်တံကို အရုပ်နဲ့တည့်အောင် ရွှေ့ပြီး နောက်တစ်ခါ ထပ်ကြိုးစားကြည့်ပါဦး!';
+        : 'လက်တံကို အရုပ်ပေါ် တည့်တည့်ကျအောင် ရွှေ့ပြီး ထပ်ကြိုးစားပါဦး!';
     document.getElementById('modalButton').innerText = 'ထပ်ကြိုးစားမယ်';
     document.getElementById('modalOverlay').classList.add('active');
 }
 
 function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
+    clearCarriedToys();
     resetClaw();
-    if (refillAfterModal) initToys();
+    // Only refill when every toy has been won
+    if (activeToys.length === 0) initToys();
 }
 
 function resetClaw() {
+    clearCarriedToys();
     clawX = 130;
     clawAssembly.style.left = clawX + 'px';
     clawAssembly.style.setProperty('--rope-height', '20px');
