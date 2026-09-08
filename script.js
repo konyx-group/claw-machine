@@ -250,7 +250,7 @@ let isBusy = false;
 let activeToys = [];
 let refillAfterModal = false;
 
-const WIN_CHANCE = 0.62;
+const WIN_CHANCE = 0.10;
 
 const clawAssembly = document.getElementById('clawAssembly');
 const clawSvg       = document.getElementById('clawSvg');
